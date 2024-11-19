@@ -6,7 +6,7 @@
 
 body {
     font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
+    background-color: #efb3e9;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -38,14 +38,14 @@ h1 {
     padding: 10px;
     width: 200px;
     margin-right: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid #000000;
     border-radius: 4px;
 }
 
 .input-section button {
     padding: 10px 15px;
     border: none;
-    background-color: #D3C5E5;
+    background-color: #efb3e9;
     color: #735DA5;
     cursor: pointer;
     border-radius: 4px;
@@ -53,7 +53,7 @@ h1 {
 }
 
 .input-section button:hover {
-    background-color: #FFFFFF;
+    background-color: #efb3e9;
 }
 
 .visualization-section {
@@ -65,38 +65,38 @@ h1 {
 #trieContainer {
     width: 65%;
     height: 500px;
-    border: 1px solid #ccc;
-    background-color: #8AAAE5;
+    border: 1px solid #00000000;
+    background-color: #efb3e9;
     position: relative;
 }
 
 #codeContainer {
     width: 30%;
     height: 500px;
-    border: 1px solid #ccc;
+    border: 1px solid #efb3e9;
     overflow: auto;
 }
 
 .code-box {
     font-family: "Courier New", Courier, monospace;
     padding: 20px;
-    background-color: #2F3C7E;
-    color: #FBEAEB;
+    background-color: #efb3e9;
+    color: #6c32d8;
     white-space: pre-wrap;
     border-radius: 4px;
     max-height: 100%;
 }
 
 .highlight {
-    background-color: rgba(255, 2, 255, 0.484);
+    background-color: rgba(255, 255, 255, 0.484);
 }
 
 .node circle {
-    fill: lightblue;
+    fill: rgb(0, 0, 0);
 }
 
 .node text {
     font-size: 14px;
     font-family: Arial, sans-serif;
-    fill: black;
+    fill: #efb3e9;
 }
