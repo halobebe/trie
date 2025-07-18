@@ -2,50 +2,106 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trie Visualization</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Password Protected Page</title>
+    <style>
+        body {
+            font-family: Lora, serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 40px 80px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 800px; /* Wider for full content */
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            margin-bottom: 20px;
+        }
+
+        input[type="password"] {
+            width: 60%;
+            padding: 15px;
+            margin: 20px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        button {
+            padding: 12px 40px;
+            background-color: #007bff;
+            border: none;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #error-message {
+            color: red;
+            font-size: 1rem;
+            margin-top: 10px;
+        }
+
+        #content-screen p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-top: 20px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Trie Visualization with C++ Code</h1>
-        <div class="input-section">
-            <input type="text" id="wordInput" placeholder="Enter a word" />
-            <button id="insertButton">Insert</button>
-            <button id="deleteButton">Delete</button>
-            <button id="replaceButton">Replace</button>
-            <button id="createRandomTrieButton">Create Random Trie</button>
-            <a href="https://halobebe.github.io/nkflow.html">
-                <button>Flow algorithm</button>
-            </a>
-            <a href="https://hackmd.io/@0VwgOzkcQB2zCFyL9JxpsQ/SyeGcoaOGJx">
-            <button>Báo cáo</button>
-            </a>
+        <div id="password-screen">
+            <h2>Enter Password to Continue</h2>
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="checkPassword()">Submit</button>
+            <p id="error-message"></p>
         </div>
-      
 
-        <div class="visualization-section">
-            <div id="trieContainer"></div>
-            <div id="codeContainer">
-                <h2>Highlighted C++ Code</h2>
-                <pre id="cppCode" class="code-box">
-                    <code>
-function insert(word) {
-    TrieNode* node = root;
-    for (char c : word) {
-        if (node->children.find(c) == node->children.end()) {
-            node->children[c] = new TrieNode();
-        }
-        node = node->children[c];
-    }
-    node->isEndOfWord = true;
-}
-                    </code>
-                </pre>
-            </div>
+        <div id="content-screen" style="display:none;">
+            <h1>🎉 Welcome!</h1>
+            <p>Theo instructions vào được đến đây thì chắc hẳn là em rồi nhỉ. Không biết em có ổn không nhỉ, bây giờ nè, hết khóc chưaaa. Anh đây, luôn luôn ở đây. Anh chưa bao giờ thấy tội lỗi như vậy cả, anh xin lỗi em, cúi đầu xin lỗi em vì những phiền toái đã mang đến cho em, vì đã tước YYGS khỏi em… Anh xin lỗi em nhiều, nhiều lắm, rất nhiều, anh không nghĩ chỉ tại anh mà chừng đó chuyện lại phải xảy đến với em, người vốn đã chịu quá nhiều điều… Nhớ lại những ngày đầu ấy, sáng nghe blue, đánh răng rồi đi học, đẹp biết bao. Một thằng nhóc lớp 11 yêu đời vô cùng đã được sinh ra, hay nói cách khác, được hồi sinh, bởi một cô bé yêu đời không kém. Từ những giây phút đó, màu hồng của Thỏ tràn ngập cuộc sống anh, từng story từng tấm ảnh anh ngắm không rời mắt luôn. Có lẽ thích em quá, nên mới theo đến vậy, và đúng thật sự là thích vô cùng, mới có ngày hôm nay. Nhưng không biết anh làm sai điều gì, mà lại dẫn đến tình cảnh này, có lẽ anh nghĩ không thông suốt, có lẽ anh bỏ sót điều gì đó, nhưng chắc chắn rằng, anh chưa bao giờ hối hận khi nói lời yêu em. Cuộc nói chuyện hôm qua, về tự trọng, có lẽ tự trọng của ba em là báo hiếu cha mẹ, nhưng mỗi người có định nghĩa “tự trọng” khác nhau nhỉ. Đối với anh, tự trọng là respect bản thân, không phải có tự trọng là sẽ bỏ tình cảm theo sự nghiệp, tự trọng đối với anh, là bỏ ngoài tai những lời lẻ cay nghiệt dùng để discourage anh. I know for sure what im doing, tự trọng đối với anh, là hoàn thành được vision của bản thân, và vision đó có em. Nên không cần lo, cả em và anh đều đã cố đến mức này rồi, thì im sure that nothing can stop us, NOTHING. He told me to preserve my dignity, and yup im doing it by respecting myself and working towards my goals - which includes you. Nên đừng lo lắng gì cả công chúa nhé, vì anh sẽ ở đây, chồng em sẽ ở đây, mãi là như vậyy❤️</p>
         </div>
     </div>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="script.js"></script>
+
+    <script>
+        const correctPassword = 'popyvatho'; // Change this to your desired password
+
+        function checkPassword() {
+            const input = document.getElementById('password').value;
+            const error = document.getElementById('error-message');
+
+            if (input === correctPassword) {
+                document.getElementById('password-screen').style.display = 'none';
+                document.getElementById('content-screen').style.display = 'block';
+            } else {
+                error.textContent = 'Incorrect password. Try again.';
+            }
+        }
+    </script>
 </body>
 </html>
