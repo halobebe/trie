@@ -34,15 +34,24 @@
 
         /* --- Custom Cursor --- */
         #cursor {
-            position: fixed; top: 0; left: 0;
-            width: 20px; height: 20px;
-            border: 1px solid var(--ink);
+            position: fixed; 
+            top: 0; 
+            left: 0;
+            width: 20px; 
+            height: 20px;
+            
+            /* Strict Black Styling */
+            border: 2px solid #000000;
+            background: transparent; 
+            
             border-radius: 50%;
             pointer-events: none;
             z-index: 9999;
             transform: translate(-50%, -50%);
             transition: width 0.2s, height 0.2s, background 0.2s;
-            mix-blend-mode: difference;
+            
+            /* DISABLES the inversion effect */
+            mix-blend-mode: normal;
         }
         body:hover #cursor { opacity: 1; }
 
@@ -362,7 +371,6 @@
             window.scrollTo(0,0);
         }
 
-        // --- Visual Effects ---
         const cursor = document.getElementById('cursor');
         document.addEventListener('mousemove', (e) => {
             cursor.style.left = e.clientX + 'px';
@@ -371,11 +379,17 @@
 
         document.querySelectorAll('a, button, .nav-item, input[type="file"]').forEach(el => {
             el.addEventListener('mouseenter', () => {
-                cursor.style.width = '50px'; cursor.style.height = '50px';
-                cursor.style.background = '#fff'; cursor.style.mixBlendMode = 'difference';
+                cursor.style.width = '50px'; 
+                cursor.style.height = '50px';
+                
+                // Optional: Adds a very faint black tint when hovering
+                cursor.style.background = 'rgba(0, 0, 0, 0.05)'; 
+                
+                // REMOVED: cursor.style.mixBlendMode = 'difference';
             });
             el.addEventListener('mouseleave', () => {
-                cursor.style.width = '20px'; cursor.style.height = '20px';
+                cursor.style.width = '20px'; 
+                cursor.style.height = '20px';
                 cursor.style.background = 'transparent';
             });
         });
