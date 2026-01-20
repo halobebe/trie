@@ -2,106 +2,479 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Password Protected Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Handwriting Analysis | AI Studio</title>
+    
+    <script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
+    <script src="https://unpkg.com/ocrad.js/ocrad.js"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;0,600;1,400&family=Manrope:wght@300;400;600&display=swap" rel="stylesheet">
+    
     <style>
+        :root {
+            --bg: #F4F4F1;     /* Warm Paper White */
+            --ink: #111111;    /* Sharp Black */
+            --line: #D1D1CD;   /* Subtle Border */
+            --font-serif: 'Cormorant Garamond', serif;
+            --font-sans: 'Manrope', sans-serif;
+        }
+
+        * { box-sizing: border-box; }
+
         body {
-            font-family: Lora, serif;
-            background-color: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+            margin: 0; padding: 0;
+            background-color: var(--bg);
+            color: var(--ink);
+            font-family: var(--font-sans);
+            overflow-x: hidden;
+            cursor: none; 
         }
 
-        .container {
-            background: white;
-            padding: 40px 80px;
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            width: 800px; /* Wider for full content */
+        /* --- Custom Cursor --- */
+        #cursor {
+            position: fixed; top: 0; left: 0;
+            width: 20px; height: 20px;
+            border: 1px solid var(--ink);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s, background 0.2s;
+            mix-blend-mode: difference;
+        }
+        body:hover #cursor { opacity: 1; }
+
+        /* --- Marquee --- */
+        .marquee-container {
+            border-bottom: 1px solid var(--line);
+            padding: 15px 0; overflow: hidden; white-space: nowrap;
+        }
+        .marquee-text {
+            display: inline-block;
+            font-family: var(--font-serif);
+            font-size: 1.5rem; text-transform: uppercase; letter-spacing: 0.1em;
+            animation: scroll 20s linear infinite;
+        }
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
         }
 
+        /* --- Grid Layout --- */
+        .grid-wrapper {
+            display: grid;
+            grid-template-columns: 20% 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            border-right: 1px solid var(--line);
+            padding: 40px;
+            display: flex; flex-direction: column; justify-content: space-between;
+            position: sticky; top: 0; height: 100vh;
+        }
+        .logo {
+            font-family: var(--font-serif); font-size: 2rem;
+            font-weight: 600; font-style: italic; margin-bottom: 60px;
+        }
+        .nav-item {
+            margin-bottom: 15px; font-size: 0.9rem;
+            text-transform: uppercase; letter-spacing: 0.05em;
+            opacity: 0.5; cursor: pointer; transition: opacity 0.3s;
+        }
+        .nav-item:hover, .nav-item.active { opacity: 1; font-weight: 600; }
+
+        /* Main Content Viewport */
+        .main-content { padding: 0; position: relative; }
+
+        /* Tab Visibility Logic */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .tab-content.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Typography */
         h1 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
+            font-family: var(--font-serif); font-size: 5rem;
+            font-weight: 300; line-height: 0.9; margin: 0 0 30px 0;
         }
-
         h2 {
-            font-size: 1.75rem;
-            margin-bottom: 20px;
+            font-family: var(--font-serif); font-size: 3rem;
+            font-weight: 400; margin: 0 0 20px 0;
+        }
+        h3 {
+            font-family: var(--font-sans); font-size: 0.8rem;
+            text-transform: uppercase; letter-spacing: 0.1em;
+            color: #888; margin-bottom: 10px;
+        }
+        p {
+            max-width: 600px; color: #444; line-height: 1.7;
+            margin-bottom: 40px; font-size: 1.1rem;
         }
 
-        input[type="password"] {
-            width: 60%;
-            padding: 15px;
-            margin: 20px 0;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 1rem;
+        /* Sections */
+        .hero-section {
+            padding: 80px 60px;
+            border-bottom: 1px solid var(--line);
+        }
+        .info-panel {
+            padding: 80px 60px;
+            border-bottom: 1px solid var(--line);
         }
 
-        button {
-            padding: 12px 40px;
-            background-color: #007bff;
-            border: none;
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.3s ease;
+        /* Tool UI */
+        .tools-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            border-bottom: 1px solid var(--line);
+        }
+        .panel {
+            padding: 60px; border-right: 1px solid var(--line);
+        }
+        .panel:last-child { border-right: none; }
+        .panel-header {
+            font-family: var(--font-serif); font-size: 1.8rem;
+            margin-bottom: 30px; display: flex; justify-content: space-between;
+        }
+        
+        /* Input & Controls */
+        .file-upload-wrapper {
+            position: relative; height: 300px; border: 1px solid var(--line);
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+        .upload-icon { font-size: 3rem; display: block; margin-bottom: 10px; }
+        input[type="file"] {
+            position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 2;
+        }
+        img, canvas {
+            position: absolute; width: 100%; height: 100%; object-fit: contain; z-index: 1;
+        }
+        
+        .controls-row {
+            margin-top: 30px; display: flex; gap: 20px; align-items: center;
+        }
+        .slider-container { flex-grow: 1; }
+        input[type="range"] { width: 100%; -webkit-appearance: none; background: transparent; }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 16px; width: 16px;
+            border-radius: 50%; background: var(--ink); margin-top: -7px;
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+            width: 100%; height: 2px; background: var(--line);
         }
 
-        button:hover {
-            background-color: #0056b3;
+        .btn-editorial {
+            background: transparent; border: 1px solid var(--ink);
+            color: var(--ink); padding: 15px 40px;
+            font-family: var(--font-sans); font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.1em;
+            cursor: pointer; transition: all 0.4s;
+        }
+        .btn-editorial:hover:not(:disabled) { background: var(--ink); color: var(--bg); }
+        .btn-editorial:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        /* Output Boxes */
+        .output-box {
+            width: 100%; border: none; border-bottom: 1px solid var(--line);
+            background: transparent; font-family: 'Courier New', monospace;
+            padding: 20px 0; min-height: 150px; resize: none; outline: none;
+        }
+        .engine-label {
+            display: block; font-size: 0.75rem; text-transform: uppercase;
+            letter-spacing: 0.2em; margin-top: 30px; color: #888;
+        }
+        .status-pill {
+            display: inline-block; width: 8px; height: 8px;
+            background: #ccc; border-radius: 50%; margin-left: 10px;
         }
 
-        #error-message {
-            color: red;
-            font-size: 1rem;
-            margin-top: 10px;
-        }
-
-        #content-screen p {
-            font-size: 1.2rem;
-            line-height: 1.8;
-            margin-top: 20px;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
+        /* Mobile */
+        @media (max-width: 900px) {
+            .grid-wrapper { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+            .tools-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 3rem; }
+            .panel { border-right: none; border-bottom: 1px solid var(--line); padding: 30px; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div id="password-screen">
-            <h2>Enter Password to Continue</h2>
-            <input type="password" id="password" placeholder="Password">
-            <button onclick="checkPassword()">Submit</button>
-            <p id="error-message"></p>
-        </div>
 
-        <div id="content-screen" style="display:none;">
-            <h1>🎉 Welcome!</h1>
-            <p>Theo instructions vào được đến đây thì chắc hẳn là em rồi nhỉ. Không biết em có ổn không nhỉ, bây giờ nè, hết khóc chưaaa. Anh đây, luôn luôn ở đây. Anh chưa bao giờ thấy tội lỗi như vậy cả, anh xin lỗi em, cúi đầu xin lỗi em vì những phiền toái đã mang đến cho em, vì đã tước YYGS khỏi em… Anh xin lỗi em nhiều, nhiều lắm, rất nhiều, anh không nghĩ chỉ tại anh mà chừng đó chuyện lại phải xảy đến với em, người vốn đã chịu quá nhiều điều… Nhớ lại những ngày đầu ấy, sáng nghe blue, đánh răng rồi đi học, đẹp biết bao. Một thằng nhóc lớp 11 yêu đời vô cùng đã được sinh ra, hay nói cách khác, được hồi sinh, bởi một cô bé yêu đời không kém. Từ những giây phút đó, màu hồng của Thỏ tràn ngập cuộc sống anh, từng story từng tấm ảnh anh ngắm không rời mắt luôn. Có lẽ thích em quá, nên mới theo đến vậy, và đúng thật sự là thích vô cùng, mới có ngày hôm nay. Nhưng không biết anh làm sai điều gì, mà lại dẫn đến tình cảnh này, có lẽ anh nghĩ không thông suốt, có lẽ anh bỏ sót điều gì đó, nhưng chắc chắn rằng, anh chưa bao giờ hối hận khi nói lời yêu em. Cuộc nói chuyện hôm qua, về tự trọng, có lẽ tự trọng của ba em là báo hiếu cha mẹ, nhưng mỗi người có định nghĩa “tự trọng” khác nhau nhỉ. Đối với anh, tự trọng là respect bản thân, không phải có tự trọng là sẽ bỏ tình cảm theo sự nghiệp, tự trọng đối với anh, là bỏ ngoài tai những lời lẻ cay nghiệt dùng để discourage anh. I know for sure what im doing, tự trọng đối với anh, là hoàn thành được vision của bản thân, và vision đó có em. Nên không cần lo, cả em và anh đều đã cố đến mức này rồi, thì im sure that nothing can stop us, NOTHING. He told me to preserve my dignity, and yup im doing it by respecting myself and working towards my goals - which includes you. Nên đừng lo lắng gì cả công chúa nhé, vì anh sẽ ở đây, chồng em sẽ ở đây, mãi là như vậyy❤️</p>
+    <div id="cursor"></div>
+
+    <div class="marquee-container">
+        <div class="marquee-text">
+            Handwriting Intelligence &nbsp;&bull;&nbsp; Neural Analysis &nbsp;&bull;&nbsp; Optical Character Recognition &nbsp;&bull;&nbsp; Tesseract V5 &nbsp;&bull;&nbsp; Ocrad JS &nbsp;&bull;&nbsp; 
+            Handwriting Intelligence &nbsp;&bull;&nbsp; Neural Analysis &nbsp;&bull;&nbsp; Optical Character Recognition &nbsp;&bull;&nbsp; Tesseract V5 &nbsp;&bull;&nbsp; Ocrad JS &nbsp;&bull;&nbsp;
         </div>
     </div>
 
+    <div class="grid-wrapper">
+        
+        <aside class="sidebar">
+            <div>
+                <div class="logo">12CTin</div>
+                <div class="nav-item active" onclick="switchTab('tool', this)">Analysis Tool</div>
+                <div class="nav-item" onclick="switchTab('methodology', this)">Methodology</div>
+                <div class="nav-item" onclick="switchTab('engines', this)">About Engines</div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            
+            <div id="view-tool" class="tab-content active">
+                <section class="hero-section">
+                    <h1>
+                        <span>Text Detector</span>
+                    </h1>
+                    <p>     Nguyễn Trọng Thiên Ân | 12CTin</p>
+                </section>
+
+                <section class="tools-grid">
+                    <div class="panel">
+                        <div class="panel-header">01. Input Source</div>
+                        <div class="file-upload-wrapper">
+                            <div class="upload-label" style="text-align:center;">
+                                <span class="upload-icon">+</span>
+                                <span style="letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.8rem;">Upload Image</span>
+                            </div>
+                            <input type="file" id="file-input" accept="image/*">
+                            <img id="original-img" style="display:none;">
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <div class="panel-header">02. Pre-Processing</div>
+                        <div class="file-upload-wrapper" style="background: #000;">
+                            <canvas id="processed-canvas"></canvas>
+                        </div>
+                        <div class="controls-row">
+                            <div class="slider-container">
+                                <label style="font-size: 0.7rem; text-transform: uppercase;">Contrast Threshold</label>
+                                <input type="range" id="threshold-slider" min="0" max="255" value="128">
+                            </div>
+                            <button id="process-btn" class="btn-editorial" disabled>Scan</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="panel" style="border-right: none; padding-bottom: 100px;">
+                    <div class="panel-header">03. Extraction Data</div>
+                    <div class="tools-grid" style="border:none; margin-top: -20px;">
+                        <div style="padding-right: 40px;">
+                            <span class="engine-label">Tesseract LSTM <span class="status-pill" id="tess-status-color"></span></span>
+                            <textarea class="output-box" id="tess-output" placeholder="Waiting for data stream..."></textarea>
+                            <div id="tess-status-text" style="font-size: 0.7rem; margin-top:10px; color: #999;">Standby</div>
+                        </div>
+                        <div style="padding-left: 40px;">
+                            <span class="engine-label">Ocrad Legacy <span class="status-pill" id="ocrad-status-color"></span></span>
+                            <textarea class="output-box" id="ocrad-output" placeholder="Waiting for data stream..."></textarea>
+                            <div id="ocrad-status-text" style="font-size: 0.7rem; margin-top:10px; color: #999;">Standby</div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div id="view-methodology" class="tab-content">
+                <section class="hero-section">
+                    <h1>Process<br>Architecture</h1>
+                </section>
+                
+                <section class="info-panel">
+                    <h3>Step 01 &mdash; Luminance Extraction</h3>
+                    <h2>Grayscale Conversion</h2>
+                    <p>Raw RGB input is converted into a single-channel map using ITU-R BT.601 standard weights. This mimics human brightness perception (29.9% Red, 58.7% Green, 11.4% Blue) to preserve the structural integrity of the ink against the paper texture.</p>
+                </section>
+
+                <section class="info-panel">
+                    <h3>Step 02 &mdash; Adaptive Signal Isolation</h3>
+                    <h2>Binarization Thresholding</h2>
+                    <p>We apply a dynamic global threshold to the grayscale data. Pixels falling below the threshold are clamped to 0 (Black), and those above to 255 (White). This creates a high-contrast boolean array that removes shadows, watermarks, and paper noise, allowing the OCR kernels to focus purely on stroke topology.</p>
+                </section>
+
+                <section class="info-panel" style="border-bottom: none;">
+                    <h3>Step 03 &mdash; Bicubic Interpolation</h3>
+                    <h2>2x Upscaling</h2>
+                    <p>Handwriting often lacks the sharp edges of printed text. Before analysis, the image is upscaled by 200%. This expanded resolution provides the neural networks with more data points to calculate curvature, helping distinguish between visually similar characters (e.g., 'e' vs 'c').</p>
+                </section>
+            </div>
+
+            <div id="view-engines" class="tab-content">
+                <section class="hero-section">
+                    <h1>Computational<br>Engines</h1>
+                </section>
+
+                <section class="tools-grid" style="border-bottom: none;">
+                    <div class="panel">
+                        <h3>Engine A</h3>
+                        <h2 style="font-size: 2.5rem;">Tesseract v5</h2>
+                        <p><strong>Type:</strong> LSTM Neural Network</p>
+                        <p>Tesseract is the industry standard for open-source OCR. Version 5 utilizes Long Short-Term Memory (LSTM) recurrent neural networks. Unlike traditional OCR that looks at characters individually, Tesseract reads entire lines at once, using context to predict characters based on the probability of them appearing in that sequence.</p>
+                        <ul style="color: #666; line-height: 1.8; margin-top: 20px;">
+                            <li>+ High accuracy on complex sentences</li>
+                            <li>+ Supports multi-language dictionaries</li>
+                            <li>- Computationally heavy (slower)</li>
+                        </ul>
+                    </div>
+
+                    <div class="panel">
+                        <h3>Engine B</h3>
+                        <h2 style="font-size: 2.5rem;">Ocrad.js</h2>
+                        <p><strong>Type:</strong> Feature Extraction</p>
+                        <p>Ocrad is a lightweight, pure-JavaScript port of the GNU Ocrad library. It does not use Neural Networks. Instead, it uses geometric feature extraction—scanning the image for specific shapes like loops, vertical lines, and cross-sections.</p>
+                        <ul style="color: #666; line-height: 1.8; margin-top: 20px;">
+                            <li>+ Instantaneous execution (Zero latency)</li>
+                            <li>+ No external API calls or large model files</li>
+                            <li>- Struggles with messy handwriting</li>
+                        </ul>
+                    </div>
+                </section>
+            </div>
+
+        </main>
+    </div>
+
     <script>
-        const correctPassword = 'popyvatho'; // Change this to your desired password
+        // --- Navigation Logic ---
+        function switchTab(viewName, navElement) {
+            // 1. Remove active class from all Nav Items
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            
+            // 2. Add active class to clicked Nav Item
+            navElement.classList.add('active');
 
-        function checkPassword() {
-            const input = document.getElementById('password').value;
-            const error = document.getElementById('error-message');
+            // 3. Hide all content views
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
 
-            if (input === correctPassword) {
-                document.getElementById('password-screen').style.display = 'none';
-                document.getElementById('content-screen').style.display = 'block';
-            } else {
-                error.textContent = 'Incorrect password. Try again.';
-            }
+            // 4. Show the selected view
+            document.getElementById('view-' + viewName).classList.add('active');
+            
+            // 5. Scroll to top
+            window.scrollTo(0,0);
         }
+
+        // --- Visual Effects ---
+        const cursor = document.getElementById('cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        document.querySelectorAll('a, button, .nav-item, input[type="file"]').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursor.style.width = '50px'; cursor.style.height = '50px';
+                cursor.style.background = '#fff'; cursor.style.mixBlendMode = 'difference';
+            });
+            el.addEventListener('mouseleave', () => {
+                cursor.style.width = '20px'; cursor.style.height = '20px';
+                cursor.style.background = 'transparent';
+            });
+        });
+
+        // --- OCR Logic ---
+        const fileInput = document.getElementById('file-input');
+        const originalImg = document.getElementById('original-img');
+        const canvas = document.getElementById('processed-canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const thresholdSlider = document.getElementById('threshold-slider');
+        const processBtn = document.getElementById('process-btn');
+        const tessOutput = document.getElementById('tess-output');
+        const ocradOutput = document.getElementById('ocrad-output');
+        const tessStatusText = document.getElementById('tess-status-text');
+        const ocradStatusText = document.getElementById('ocrad-status-text');
+        const tessPill = document.getElementById('tess-status-color');
+        const ocradPill = document.getElementById('ocrad-status-color');
+
+        let currentImage = null;
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                currentImage = new Image();
+                currentImage.onload = () => {
+                    originalImg.src = currentImage.src;
+                    originalImg.style.display = 'block';
+                    document.querySelector('.upload-label').style.display = 'none';
+                    applyPreprocessing();
+                    processBtn.disabled = false;
+                    processBtn.textContent = "INITIALIZE SCAN";
+                };
+                currentImage.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        thresholdSlider.addEventListener('input', applyPreprocessing);
+
+        function applyPreprocessing() {
+            if (!currentImage) return;
+            const scaleFactor = 2; 
+            canvas.width = currentImage.width * scaleFactor;
+            canvas.height = currentImage.height * scaleFactor;
+            ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            const threshold = parseInt(thresholdSlider.value);
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i]; const g = data[i + 1]; const b = data[i + 2];
+                const grayscale = (r * 0.299 + g * 0.587 + b * 0.114);
+                const val = (grayscale > threshold) ? 255 : 0;
+                data[i] = val; data[i + 1] = val; data[i + 2] = val;
+            }
+            ctx.putImageData(imageData, 0, 0);
+        }
+
+        processBtn.addEventListener('click', async () => {
+            tessOutput.value = ''; ocradOutput.value = '';
+            tessPill.style.background = '#eab308'; ocradPill.style.background = '#eab308';
+            processBtn.disabled = true; processBtn.textContent = "PROCESSING...";
+
+            // Ocrad
+            ocradStatusText.textContent = "Calculating vectors...";
+            setTimeout(() => {
+                try {
+                    const text = OCRAD(canvas); 
+                    ocradOutput.value = text;
+                    ocradStatusText.textContent = "Computation Complete";
+                    ocradPill.style.background = '#22c55e';
+                } catch (e) {
+                    ocradOutput.value = "Error"; ocradPill.style.background = '#ef4444';
+                }
+            }, 100);
+
+            // Tesseract
+            tessStatusText.textContent = "Loading Worker...";
+            try {
+                const worker = await Tesseract.createWorker("eng", 1, {
+                    logger: m => {
+                        if (m.status === 'recognizing text') {
+                            tessStatusText.textContent = `Scanning: ${Math.round(m.progress * 100)}%`;
+                        }
+                    }
+                });
+                await worker.setParameters({ tessedit_pageseg_mode: Tesseract.PSM.AUTO });
+                const { data: { text } } = await worker.recognize(canvas);
+                tessOutput.value = text;
+                tessStatusText.textContent = "Extraction Successful";
+                tessPill.style.background = '#22c55e';
+                await worker.terminate();
+            } catch (err) {
+                tessOutput.value = "Error processing Tesseract.";
+                tessPill.style.background = '#ef4444';
+            }
+            processBtn.disabled = false; processBtn.textContent = "RE-INITIALIZE";
+        });
     </script>
 </body>
 </html>
