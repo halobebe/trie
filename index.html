@@ -14,159 +14,99 @@
     
     <style>
         :root {
-            --bg: #F4F4F1;     /* Warm Paper White */
-            --ink: #111111;    /* Sharp Black */
-            --line: #D1D1CD;   /* Subtle Border */
+            --bg: #F4F4F1; --ink: #111111; --line: #D1D1CD;
             --font-serif: 'Cormorant Garamond', serif;
             --font-sans: 'Manrope', sans-serif;
         }
 
         * { box-sizing: border-box; }
+        body { margin: 0; padding: 0; background-color: var(--bg); color: var(--ink); font-family: var(--font-sans); overflow-x: hidden; cursor: none; }
 
-        body {
-            margin: 0; padding: 0;
-            background-color: var(--bg);
-            color: var(--ink);
-            font-family: var(--font-sans);
-            overflow-x: hidden;
-            cursor: none; 
-        }
+        /* Custom Cursor */
+        #cursor { position: fixed; top: 0; left: 0; width: 20px; height: 20px; border: 2px solid #000000; background: transparent; border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); transition: width 0.2s, height 0.2s, background 0.2s; mix-blend-mode: normal; }
 
-        /* --- Custom Cursor --- */
-        #cursor {
-            position: fixed; top: 0; left: 0; width: 20px; height: 20px;
-            border: 2px solid #000000; background: transparent; 
-            border-radius: 50%; pointer-events: none; z-index: 9999;
-            transform: translate(-50%, -50%); transition: width 0.2s, height 0.2s, background 0.2s;
-            mix-blend-mode: normal; 
-        }
+        /* Marquee */
+        .marquee-container { border-bottom: 1px solid var(--line); padding: 15px 0; overflow: hidden; white-space: nowrap; }
+        .marquee-text { display: inline-block; font-family: var(--font-serif); font-size: 1.5rem; text-transform: uppercase; letter-spacing: 0.1em; animation: scroll 20s linear infinite; }
+        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-        /* --- Marquee --- */
-        .marquee-container {
-            border-bottom: 1px solid var(--line); padding: 15px 0; overflow: hidden; white-space: nowrap;
-        }
-        .marquee-text {
-            display: inline-block; font-family: var(--font-serif); font-size: 1.5rem; 
-            text-transform: uppercase; letter-spacing: 0.1em; animation: scroll 20s linear infinite;
-        }
-        @keyframes scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-
-        /* --- Grid Layout --- */
-        .grid-wrapper {
-            display: grid; grid-template-columns: 20% 1fr; min-height: 100vh;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            border-right: 1px solid var(--line); padding: 40px;
-            display: flex; flex-direction: column; justify-content: space-between;
-            position: sticky; top: 0; height: 100vh;
-        }
-        .logo {
-            font-family: var(--font-serif); font-size: 2rem;
-            font-weight: 600; font-style: italic; margin-bottom: 60px;
-        }
-        .nav-item {
-            margin-bottom: 15px; font-size: 0.9rem; text-transform: uppercase; 
-            letter-spacing: 0.05em; opacity: 0.5; cursor: pointer; transition: opacity 0.3s;
-        }
+        /* Grid Layout & Sidebar */
+        .grid-wrapper { display: grid; grid-template-columns: 20% 1fr; min-height: 100vh; }
+        .sidebar { border-right: 1px solid var(--line); padding: 40px; display: flex; flex-direction: column; justify-content: space-between; position: sticky; top: 0; height: 100vh; }
+        .logo { font-family: var(--font-serif); font-size: 2rem; font-weight: 600; font-style: italic; margin-bottom: 60px; }
+        .nav-item { margin-bottom: 15px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.5; cursor: pointer; transition: opacity 0.3s; }
         .nav-item:hover, .nav-item.active { opacity: 1; font-weight: 600; }
 
-        /* Main Content Viewport */
+        /* Main Content & Tabs */
         .main-content { padding: 0; position: relative; }
         .tab-content { display: none; animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
         .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Typography */
+        /* Typography & Layouts */
         h1 { font-family: var(--font-serif); font-size: 5rem; font-weight: 300; line-height: 0.9; margin: 0 0 30px 0; }
         h2 { font-family: var(--font-serif); font-size: 3rem; font-weight: 400; margin: 0 0 20px 0; }
         h3 { font-family: var(--font-sans); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: #888; margin-bottom: 10px; }
         p { max-width: 600px; color: #444; line-height: 1.7; margin-bottom: 40px; font-size: 1.1rem; }
-
-        /* Sections */
-        .hero-section { padding: 80px 60px; border-bottom: 1px solid var(--line); }
-        .info-panel { padding: 80px 60px; border-bottom: 1px solid var(--line); }
-
-        /* Tool UI */
+        .hero-section, .info-panel { padding: 80px 60px; border-bottom: 1px solid var(--line); }
         .tools-grid { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--line); }
         .panel { padding: 60px; border-right: 1px solid var(--line); }
         .panel:last-child { border-right: none; }
         .panel-header { font-family: var(--font-serif); font-size: 1.8rem; margin-bottom: 30px; display: flex; justify-content: space-between; }
         
-        .file-upload-wrapper {
-            position: relative; height: 300px; border: 1px solid var(--line);
-            display: flex; align-items: center; justify-content: center; overflow: hidden;
-        }
+        /* App UI Elements (OCR Tool) */
+        .file-upload-wrapper { position: relative; height: 300px; border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; overflow: hidden; background: #fff; }
         .upload-icon { font-size: 3rem; display: block; margin-bottom: 10px; }
         input[type="file"] { position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 2; }
         img, canvas { position: absolute; width: 100%; height: 100%; object-fit: contain; z-index: 1; }
-        
         .controls-row { margin-top: 30px; display: flex; gap: 20px; align-items: center; }
         .slider-container { flex-grow: 1; }
         input[type="range"] { width: 100%; -webkit-appearance: none; background: transparent; }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: var(--ink); margin-top: -7px; }
         input[type="range"]::-webkit-slider-runnable-track { width: 100%; height: 2px; background: var(--line); }
-
-        .btn-editorial {
-            background: transparent; border: 1px solid var(--ink); color: var(--ink); 
-            padding: 15px 40px; font-family: var(--font-sans); font-weight: 600;
-            text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; transition: all 0.4s;
-        }
+        .btn-editorial { background: transparent; border: 1px solid var(--ink); color: var(--ink); padding: 15px 40px; font-family: var(--font-sans); font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; transition: all 0.4s; }
         .btn-editorial:hover:not(:disabled) { background: var(--ink); color: var(--bg); }
         .btn-editorial:disabled { opacity: 0.3; cursor: not-allowed; }
-
-        .output-box {
-            width: 100%; border: none; border-bottom: 1px solid var(--line); background: transparent; 
-            font-family: 'Courier New', monospace; padding: 20px 0; min-height: 150px; resize: none; outline: none;
-        }
+        .output-box { width: 100%; border: none; border-bottom: 1px solid var(--line); background: transparent; font-family: 'Courier New', monospace; padding: 20px 0; min-height: 150px; resize: none; outline: none; }
         .engine-label { display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; margin-top: 30px; color: #888; }
         .status-pill { display: inline-block; width: 8px; height: 8px; background: #ccc; border-radius: 50%; margin-left: 10px; }
+        
+        /* Auth & Chat Elements */
+        .auth-input { width: 100%; max-width: 400px; padding: 15px; margin-bottom: 15px; border: 1px solid var(--line); background: transparent; font-family: var(--font-sans); font-size: 1rem; color: var(--ink); outline: none; }
+        .chat-box { width: 100%; height: 400px; border: 1px solid var(--line); padding: 20px; overflow-y: auto; background: #fff; margin-bottom: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .chat-msg { max-width: 80%; padding: 12px 18px; border-radius: 8px; font-size: 0.95rem; line-height: 1.4; position: relative; }
+        .msg-sender { font-size: 0.7rem; font-weight: bold; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .chat-msg.mine { background: var(--ink); color: var(--bg); align-self: flex-end; border-bottom-right-radius: 0; }
+        .chat-msg.mine .msg-sender { color: #aaa; }
+        .chat-msg.others { background: #f1f5f9; color: var(--ink); align-self: flex-start; border-bottom-left-radius: 0; border: 1px solid var(--line); }
+        .chat-msg.others .msg-sender { color: #64748b; }
+        .chat-msg.ai-bot { background: #fee2e2; color: #991b1b; align-self: flex-start; border-bottom-left-radius: 0; border: 1px solid #fca5a5; }
+        .chat-msg.ai-bot .msg-sender { color: #dc2626; }
+        .chat-input-row { display: flex; gap: 10px; }
+        .chat-input-row input { flex-grow: 1; padding: 15px; border: 1px solid var(--line); background: transparent; font-family: var(--font-sans); font-size: 1rem; outline: none; }
 
-        /* Auth Forms */
-        .auth-input {
-            width: 100%; max-width: 400px; padding: 15px; margin-bottom: 15px; 
-            border: 1px solid var(--line); background: transparent; font-family: var(--font-sans);
-            font-size: 1rem; color: var(--ink); outline: none;
-        }
-        .auth-input:focus { border-color: var(--ink); }
-
-        @media (max-width: 900px) {
-            .grid-wrapper { grid-template-columns: 1fr; }
-            .sidebar { display: none; }
-            .tools-grid { grid-template-columns: 1fr; }
-            h1 { font-size: 3rem; }
-            .panel { border-right: none; border-bottom: 1px solid var(--line); padding: 30px; }
-        }
+        @media (max-width: 900px) { .grid-wrapper { grid-template-columns: 1fr; } .sidebar { display: none; } .tools-grid { grid-template-columns: 1fr; } h1 { font-size: 3rem; } .panel { border-right: none; border-bottom: 1px solid var(--line); padding: 30px; } }
     </style>
 </head>
 <body>
-
     <div id="cursor"></div>
 
     <div class="marquee-container">
         <div class="marquee-text">
-            Handwriting Intelligence &nbsp;&bull;&nbsp; Neural Analysis &nbsp;&bull;&nbsp; Optical Character Recognition &nbsp;&bull;&nbsp; Tesseract V5 &nbsp;&bull;&nbsp; Cloud Database &nbsp;&bull;&nbsp; 
-            Handwriting Intelligence &nbsp;&bull;&nbsp; Neural Analysis &nbsp;&bull;&nbsp; Optical Character Recognition &nbsp;&bull;&nbsp; Tesseract V5 &nbsp;&bull;&nbsp; Cloud Database &nbsp;&bull;&nbsp;
+            Handwriting Intelligence &nbsp;&bull;&nbsp; Neural Analysis &nbsp;&bull;&nbsp; Cloud Database &nbsp;&bull;&nbsp; Global Network &nbsp;&bull;&nbsp; 
+            Handwriting Intelligence &nbsp;&bull;&nbsp; Neural Analysis &nbsp;&bull;&nbsp; Cloud Database &nbsp;&bull;&nbsp; Global Network &nbsp;&bull;&nbsp;
         </div>
     </div>
 
     <div class="grid-wrapper">
-        
         <aside class="sidebar">
             <div>
                 <div class="logo">Ogaki<br>Style</div>
                 <div class="nav-item active" onclick="switchTab('tool', this)">Analysis Tool</div>
                 <div class="nav-item" onclick="switchTab('methodology', this)">Methodology</div>
                 <div class="nav-item" onclick="switchTab('engines', this)">About Engines</div>
-                <div class="nav-item" onclick="switchTab('account', this)" style="margin-top: 40px; color: #2563eb;">Client Access</div>
+                <div class="nav-item" onclick="switchTab('chat', this)" style="margin-top: 40px;">Global Network</div>
+                <div class="nav-item" onclick="switchTab('account', this)" style="color: #2563eb;">Client Access</div>
             </div>
             <div style="font-size: 0.75rem; color: #888;">
                 &copy; 2026 AI LABS<br>EST. NYC / TOKYO<br><br>
@@ -175,70 +115,47 @@
         </aside>
 
         <main class="main-content">
-            
             <div id="view-tool" class="tab-content active">
-                <section class="hero-section">
-                    <h1>
-                        <span>Analog to</span>
-                        <span>Digital_Conversion</span>
-                    </h1>
-                    <p>Advanced neural networks designed to decipher human handwriting. Upload your documents to process them through our dual-engine architecture.</p>
-                </section>
-
+                <section class="hero-section"><h1><span>Analog to</span><span>Digital_Conversion</span></h1></section>
                 <section class="tools-grid">
                     <div class="panel">
                         <div class="panel-header">01. Input Source</div>
                         <div class="file-upload-wrapper">
-                            <div class="upload-label" style="text-align:center;">
-                                <span class="upload-icon">+</span>
-                                <span style="letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.8rem;">Upload Image</span>
-                            </div>
+                            <div class="upload-label" style="text-align:center;"><span class="upload-icon">+</span><span style="letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.8rem;">Upload Image</span></div>
                             <input type="file" id="file-input" accept="image/*">
                             <img id="original-img" style="display:none;">
                         </div>
                     </div>
-
                     <div class="panel">
                         <div class="panel-header">02. Pre-Processing</div>
-                        <div class="file-upload-wrapper" style="background: #000;">
-                            <canvas id="processed-canvas"></canvas>
-                        </div>
+                        <div class="file-upload-wrapper" style="background: #000;"><canvas id="processed-canvas"></canvas></div>
                         <div class="controls-row">
-                            <div class="slider-container">
-                                <label style="font-size: 0.7rem; text-transform: uppercase;">Contrast Threshold</label>
-                                <input type="range" id="threshold-slider" min="0" max="255" value="128">
-                            </div>
+                            <div class="slider-container"><label style="font-size: 0.7rem; text-transform: uppercase; color: #888;">Contrast Threshold</label><br><input type="range" id="threshold-slider" min="0" max="255" value="128"></div>
                             <button id="process-btn" class="btn-editorial" disabled>Scan</button>
                         </div>
                     </div>
                 </section>
-
                 <section class="panel" style="border-right: none; padding-bottom: 100px;">
                     <div class="panel-header">03. Extraction Data</div>
                     <div class="tools-grid" style="border:none; margin-top: -20px;">
-                        
                         <div style="padding-right: 40px;">
                             <span class="engine-label">Tesseract LSTM <span class="status-pill" id="tess-status-color"></span></span>
                             <textarea class="output-box" id="tess-output" placeholder="Waiting for data stream..."></textarea>
                             <div id="tess-status-text" style="font-size: 0.7rem; margin-top:10px; color: #999;">Standby</div>
-                            
                             <div style="margin-top: 15px; display: flex; gap: 10px;">
-                                <button id="download-tess-btn" class="btn-editorial" style="padding: 8px 15px; font-size: 0.7rem;" disabled>Download .TXT</button>
-                                <button id="save-tess-btn" class="btn-editorial" style="padding: 8px 15px; font-size: 0.7rem; border-color:#2563eb; color:#2563eb;" disabled>Save to Cloud</button>
+                                <button id="download-tess-btn" class="btn-editorial" style="padding: 8px 15px; font-size: 0.7rem;" disabled>Download</button>
+                                <button id="save-tess-btn" class="btn-editorial" style="padding: 8px 15px; font-size: 0.7rem; border-color:#2563eb; color:#2563eb;" disabled>Save Data</button>
                             </div>
                         </div>
-
                         <div style="padding-left: 40px;">
                             <span class="engine-label">Ocrad Legacy <span class="status-pill" id="ocrad-status-color"></span></span>
                             <textarea class="output-box" id="ocrad-output" placeholder="Waiting for data stream..."></textarea>
                             <div id="ocrad-status-text" style="font-size: 0.7rem; margin-top:10px; color: #999;">Standby</div>
-                            
                             <div style="margin-top: 15px; display: flex; gap: 10px;">
-                                <button id="download-ocrad-btn" class="btn-editorial" style="padding: 8px 15px; font-size: 0.7rem;" disabled>Download .TXT</button>
-                                <button id="save-ocrad-btn" class="btn-editorial" style="padding: 8px 15px; font-size: 0.7rem; border-color:#2563eb; color:#2563eb;" disabled>Save to Cloud</button>
+                                <button id="download-ocrad-btn" class="btn-editorial" style="padding: 8px 15px; font-size: 0.7rem;" disabled>Download</button>
+                                <button id="save-ocrad-btn" class="btn-editorial" style="padding: 8px 15px; font-size: 0.7rem; border-color:#2563eb; color:#2563eb;" disabled>Save Data</button>
                             </div>
                         </div>
-
                     </div>
                 </section>
             </div>
@@ -265,7 +182,7 @@
                     <div class="panel">
                         <h3>Engine A</h3><h2 style="font-size: 2.5rem;">Tesseract v5</h2>
                         <p><strong>Type:</strong> LSTM Neural Network</p>
-                        <p>Uses Long Short-Term Memory recurrent neural networks. Reads entire lines at once using sequence probability.</p>
+                        <p>Uses Long Short-Term Memory recurrent neural networks. Reads entire lines at once using context probability.</p>
                     </div>
                     <div class="panel">
                         <h3>Engine B</h3><h2 style="font-size: 2.5rem;">Ocrad.js</h2>
@@ -275,33 +192,50 @@
                 </section>
             </div>
 
-            <div id="view-account" class="tab-content">
+            <div id="view-chat" class="tab-content">
                 <section class="hero-section">
-                    <h1>Cloud<br>Interface</h1>
-                    <p>Authenticate to save your neural network extraction data securely to the Firebase architecture.</p>
+                    <h1>Global<br>Network</h1>
+                    <p>Communicate with other connected analysts in real-time. Type <b>@AI</b> at the start of your message to query the system agent.</p>
                 </section>
-
                 <section class="info-panel" style="border-bottom: none;">
                     
+                    <div id="chat-lock-screen">
+                        <h2>Access Denied</h2>
+                        <p>You must authenticate via Client Access to connect to the Global Network.</p>
+                        <button class="btn-editorial" onclick="switchTab('account', document.querySelectorAll('.nav-item')[4])">Go to Login</button>
+                    </div>
+
+                    <div id="chat-interface" style="display: none;">
+                        <div class="chat-box" id="chat-messages-container">
+                            </div>
+                        <div class="chat-input-row">
+                            <input type="text" id="chat-input" placeholder="Type a message or @AI...">
+                            <button id="chat-send-btn" class="btn-editorial" style="padding: 15px 30px;">Transmit</button>
+                        </div>
+                    </div>
+
+                </section>
+            </div>
+
+            <div id="view-account" class="tab-content">
+                <section class="hero-section"><h1>Cloud<br>Interface</h1></section>
+                <section class="info-panel" style="border-bottom: none;">
                     <div id="auth-container">
                         <h2>System Authentication</h2>
                         <input type="email" id="email-input" class="auth-input" placeholder="Email Address"><br>
                         <input type="password" id="password-input" class="auth-input" placeholder="Password"><br>
-                        
                         <div style="display: flex; gap: 15px; margin-top: 15px;">
                             <button id="login-btn" class="btn-editorial">Log In</button>
-                            <button id="register-btn" class="btn-editorial" style="background: var(--ink); color: var(--bg);">Register Account</button>
+                            <button id="register-btn" class="btn-editorial" style="background: var(--ink); color: var(--bg);">Register</button>
                         </div>
                         <p id="auth-error-msg" style="color: #ef4444; font-size: 0.9rem; margin-top: 15px;"></p>
                     </div>
-
                     <div id="profile-container" style="display: none;">
                         <h3>Active Session</h3>
                         <h2 id="user-display-email" style="margin-bottom: 40px;">user@email.com</h2>
                         <p style="color: #22c55e;">&bull; Database connection established.</p>
                         <button id="logout-btn" class="btn-editorial" style="border-color: #ef4444; color: #ef4444;">Terminate Session</button>
                     </div>
-
                 </section>
             </div>
 
@@ -309,14 +243,13 @@
     </div>
 
     <script type="module">
-        // Import all the Firebase toys!
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } 
             from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, serverTimestamp } 
+        import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, query, orderBy } 
             from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
-        // Your specific configuration
+        // *** YOUR EXACT FIREBASE API KEY ***
         const firebaseConfig = {
             apiKey: "AIzaSyAxQRoryENUqjO19Vsr404EzDj1kjAfl24",
             authDomain: "halobebe-753d5.firebaseapp.com",
@@ -329,108 +262,165 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        window.currentUser = null;
 
-        // --- AUTHENTICATION LOGIC ---
-        const emailInput = document.getElementById('email-input');
-        const passInput = document.getElementById('password-input');
+        // --- AUTH LOGIC ---
         const errorMsg = document.getElementById('auth-error-msg');
-        
-        let currentUser = null; // Keeps track of who is logged in
+        let chatUnsubscribe = null;
 
-        // Register Button
         document.getElementById('register-btn').addEventListener('click', () => {
-            createUserWithEmailAndPassword(auth, emailInput.value, passInput.value)
-                .then(() => { errorMsg.textContent = "Account Created!"; })
+            createUserWithEmailAndPassword(auth, document.getElementById('email-input').value, document.getElementById('password-input').value)
                 .catch(err => { errorMsg.textContent = "Error: " + err.message; });
         });
-
-        // Login Button
         document.getElementById('login-btn').addEventListener('click', () => {
-            signInWithEmailAndPassword(auth, emailInput.value, passInput.value)
+            signInWithEmailAndPassword(auth, document.getElementById('email-input').value, document.getElementById('password-input').value)
                 .catch(err => { errorMsg.textContent = "Error: " + err.message; });
         });
+        document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
 
-        // Logout Button
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            signOut(auth);
-        });
-
-        // Listen for Login/Logout State Changes
         onAuthStateChanged(auth, (user) => {
-            currentUser = user;
+            window.currentUser = user;
             if (user) {
-                // User is signed in! Update UI
+                // User logged in
                 document.getElementById('auth-container').style.display = 'none';
                 document.getElementById('profile-container').style.display = 'block';
                 document.getElementById('user-display-email').textContent = user.email;
+                document.getElementById('auth-status-indicator').innerHTML = '&bull; Connected';
+                document.getElementById('auth-status-indicator').style.color = '#22c55e';
                 
-                // Update Sidebar indicator
-                const indicator = document.getElementById('auth-status-indicator');
-                indicator.innerHTML = '&bull; Connected';
-                indicator.style.color = '#22c55e'; // Green
-                
-                // Enable save buttons if text exists
+                // Unlock Chat & Save Buttons
+                document.getElementById('chat-lock-screen').style.display = 'none';
+                document.getElementById('chat-interface').style.display = 'block';
                 if(document.getElementById('tess-output').value) document.getElementById('save-tess-btn').disabled = false;
                 if(document.getElementById('ocrad-output').value) document.getElementById('save-ocrad-btn').disabled = false;
                 
+                startChatListener();
             } else {
-                // User is signed out! Update UI
+                // User logged out
                 document.getElementById('auth-container').style.display = 'block';
                 document.getElementById('profile-container').style.display = 'none';
-                errorMsg.textContent = "";
+                document.getElementById('auth-status-indicator').innerHTML = '&bull; Disconnected';
+                document.getElementById('auth-status-indicator').style.color = '#ef4444';
                 
-                const indicator = document.getElementById('auth-status-indicator');
-                indicator.innerHTML = '&bull; Disconnected';
-                indicator.style.color = '#ef4444'; // Red
-
-                // Lock down save buttons
+                // Lock Chat & Save Buttons
+                document.getElementById('chat-lock-screen').style.display = 'block';
+                document.getElementById('chat-interface').style.display = 'none';
                 document.getElementById('save-tess-btn').disabled = true;
                 document.getElementById('save-ocrad-btn').disabled = true;
+                
+                if (chatUnsubscribe) chatUnsubscribe();
             }
         });
 
-        // --- DATABASE LOGIC (Saving Scans) ---
+        // --- DATABASE SAVE LOGIC (OCR) ---
         async function saveScanToCloud(text, engineName, btnElement) {
-            if (!currentUser) return alert("Please log in via Client Access to save to the cloud.");
+            if (!window.currentUser) return alert("Please log in to save to the cloud.");
             if (!text) return;
 
             const originalText = btnElement.textContent;
-            btnElement.textContent = "Saving...";
-            btnElement.disabled = true;
+            btnElement.textContent = "Saving..."; btnElement.disabled = true;
 
             try {
-                // Add a new document to a "scans" collection
                 await addDoc(collection(db, "scans"), {
-                    userId: currentUser.uid,
-                    userEmail: currentUser.email,
+                    userId: window.currentUser.uid,
+                    userEmail: window.currentUser.email,
                     engine: engineName,
                     scanText: text,
                     timestamp: serverTimestamp()
                 });
                 
-                btnElement.textContent = "Saved to Cloud!";
-                btnElement.style.background = "#dcfce7"; // Light green flash
-                setTimeout(() => {
-                    btnElement.textContent = originalText;
-                    btnElement.disabled = false;
-                    btnElement.style.background = "transparent";
-                }, 2000);
-
+                btnElement.textContent = "Saved to Cloud!"; btnElement.style.background = "#dcfce7";
+                setTimeout(() => { btnElement.textContent = originalText; btnElement.disabled = false; btnElement.style.background = "transparent"; }, 2000);
             } catch (e) {
-                console.error("Error adding document: ", e);
-                alert("Error saving to database. Check console.");
-                btnElement.textContent = "Save Failed";
+                console.error(e); btnElement.textContent = "Save Failed";
             }
         }
 
-        // Attach clicks to the new save buttons
-        document.getElementById('save-tess-btn').addEventListener('click', function() {
-            saveScanToCloud(document.getElementById('tess-output').value, "Tesseract", this);
-        });
+        document.getElementById('save-tess-btn').addEventListener('click', function() { saveScanToCloud(document.getElementById('tess-output').value, "Tesseract", this); });
+        document.getElementById('save-ocrad-btn').addEventListener('click', function() { saveScanToCloud(document.getElementById('ocrad-output').value, "Ocrad", this); });
 
-        document.getElementById('save-ocrad-btn').addEventListener('click', function() {
-            saveScanToCloud(document.getElementById('ocrad-output').value, "Ocrad", this);
-        });
+        // --- REAL-TIME CHAT LOGIC ---
+        const chatContainer = document.getElementById('chat-messages-container');
+        const chatInput = document.getElementById('chat-input');
+        
+        function startChatListener() {
+            const q = query(collection(db, "global_chat"), orderBy("timestamp", "asc"));
+            chatUnsubscribe = onSnapshot(q, (snapshot) => {
+                chatContainer.innerHTML = ''; 
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const msgDiv = document.createElement('div');
+                    
+                    if (data.isAI) msgDiv.className = 'chat-msg ai-bot';
+                    else if (data.email === window.currentUser.email) msgDiv.className = 'chat-msg mine';
+                    else msgDiv.className = 'chat-msg others';
+
+                    const username = data.email ? data.email.split('@')[0] : "System";
+                    msgDiv.innerHTML = `<div class="msg-sender">${username}</div><div>${data.text}</div>`;
+                    chatContainer.appendChild(msgDiv);
+                });
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            });
+        }
+
+        async function sendChatMessage() {
+            const text = chatInput.value.trim();
+            if (!text || !window.currentUser) return;
+            chatInput.value = '';
+
+            await addDoc(collection(db, "global_chat"), {
+                text: text, email: window.currentUser.email, timestamp: serverTimestamp(), isAI: false
+            });
+
+            if (text.toUpperCase().startsWith('@AI')) {
+                // 1. Clean the prompt (remove the "@AI" part so Gemini just reads the question)
+                const prompt = text.replace(/@ai/i, '').trim();
+                
+                // 2. PASTE YOUR GEMINI API KEY HERE
+                const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY_GOES_HERE"; 
+                
+                // 3. Call the Gemini 1.5 Flash Model API
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+                
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: prompt }] }]
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    // 4. Extract the text from Gemini's response
+                    let aiReply = "Error parsing AI response.";
+                    if (data.candidates && data.candidates.length > 0) {
+                        aiReply = data.candidates[0].content.parts[0].text;
+                    }
+                    
+                    // 5. Send Gemini's answer to the Firebase Chat!
+                    await addDoc(collection(db, "global_chat"), {
+                        text: aiReply, 
+                        email: "System_AI", 
+                        timestamp: serverTimestamp(), 
+                        isAI: true
+                    });
+
+                } catch (error) {
+                    console.error("Gemini API Error:", error);
+                    await addDoc(collection(db, "global_chat"), {
+                        text: "System Error: Connection to Gemini Neural Network failed. Check console or API key.", 
+                        email: "System_AI", 
+                        timestamp: serverTimestamp(), 
+                        isAI: true
+                    });
+                }
+            }
+        }
+
+        document.getElementById('chat-send-btn').addEventListener('click', sendChatMessage);
+        chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendChatMessage(); });
     </script>
 
     <script>
@@ -445,17 +435,10 @@
 
         // --- Visual Effects ---
         const cursor = document.getElementById('cursor');
-        document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px';
-        });
-
-        document.querySelectorAll('a, button, .nav-item, input[type="file"]').forEach(el => {
-            el.addEventListener('mouseenter', () => {
-                cursor.style.width = '50px'; cursor.style.height = '50px'; cursor.style.background = 'rgba(0, 0, 0, 0.05)'; 
-            });
-            el.addEventListener('mouseleave', () => {
-                cursor.style.width = '20px'; cursor.style.height = '20px'; cursor.style.background = 'transparent';
-            });
+        document.addEventListener('mousemove', (e) => { cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px'; });
+        document.querySelectorAll('a, button, .nav-item, input').forEach(el => {
+            el.addEventListener('mouseenter', () => { cursor.style.width = '50px'; cursor.style.height = '50px'; cursor.style.background = 'rgba(0, 0, 0, 0.05)'; });
+            el.addEventListener('mouseleave', () => { cursor.style.width = '20px'; cursor.style.height = '20px'; cursor.style.background = 'transparent'; });
         });
 
         // --- OCR Logic ---
@@ -489,11 +472,13 @@
                 currentImage.onload = () => {
                     originalImg.src = currentImage.src; originalImg.style.display = 'block';
                     document.querySelector('.upload-label').style.display = 'none';
-                    applyPreprocessing(); processBtn.disabled = false; processBtn.textContent = "INITIALIZE SCAN";
+                    applyPreprocessing(); 
+                    processBtn.disabled = false; processBtn.textContent = "INITIALIZE SCAN";
                     
-                    // Reset buttons
+                    // Reset UI
                     downloadTessBtn.disabled = true; downloadOcradBtn.disabled = true;
                     saveTessBtn.disabled = true; saveOcradBtn.disabled = true;
+                    tessOutput.value = ''; ocradOutput.value = '';
                 };
                 currentImage.src = event.target.result;
             };
@@ -525,7 +510,7 @@
 
             const isConnected = document.getElementById('auth-status-indicator').innerText.includes("Connected");
 
-            // Ocrad
+            // --- Run Ocrad ---
             ocradStatusText.textContent = "Calculating vectors...";
             setTimeout(() => {
                 try {
@@ -536,7 +521,7 @@
                 } catch (e) { ocradOutput.value = "Error"; ocradPill.style.background = '#ef4444'; }
             }, 100);
 
-            // Tesseract
+            // --- Run Tesseract ---
             tessStatusText.textContent = "Loading Worker...";
             try {
                 const worker = await Tesseract.createWorker("eng", 1, {
